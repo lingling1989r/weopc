@@ -1,0 +1,222 @@
+[
+  {
+    "id": "proj_1",
+    "date": "2025-04-13",
+    "title": "小红书电商这个蓝海赛道，现在入场还是红利期",
+    "category": "小红书",
+    "difficulty": "中等",
+    "revenue": null,
+    "featured": false,
+    "description": "详细分析小红书电商的市场机会、竞争格局和新手入门策略",
+    "tags": ["小红书", "电商", "蓝海", "新手友好"]
+  },
+  {
+    "id": "proj_2",
+    "date": "2025-01-02",
+    "title": "从电商新手到单日变现5000+，我是如何做到闲鱼爆单的",
+    "category": "闲鱼",
+    "difficulty": "简单",
+    "revenue": "5000+",
+    "featured": true,
+    "description": "闲鱼电商从0到1的完整案例，分享如何快速达到日变现5000+的实操方法",
+    "tags": ["闲鱼", "电商", "变现案例", "高收益"]
+  },
+  {
+    "id": "proj_3",
+    "date": "2024-12-27",
+    "title": "0粉也能迅速变现，我发现了适合普通人长期做的副业项目",
+    "category": "蓝海项目",
+    "difficulty": "简单",
+    "revenue": null,
+    "featured": false,
+    "description": "适合0粉丝开始、无需粉丝基础即可变现的副业项目，长期可做",
+    "tags": ["蓝海", "无粉丝", "长期项目", "普通人"]
+  },
+  {
+    "id": "proj_4",
+    "date": "2024-12-12",
+    "title": "新手也能迅速变现，分享6个Youtube（油管）小众赚钱机会",
+    "category": "YouTube",
+    "difficulty": "简单",
+    "revenue": null,
+    "featured": false,
+    "description": "YouTube平台6个小众但高效的赚钱机会，适合英文不错的新手",
+    "tags": ["YouTube", "国际平台", "多个机会", "新手友好"]
+  },
+  {
+    "id": "proj_5",
+    "date": "2024-12-05",
+    "title": "新手如何高效生成AI视频，避开内卷快速赚到美金？",
+    "category": "AI视频",
+    "difficulty": "简单",
+    "revenue": null,
+    "featured": false,
+    "description": "AI视频生成工具使用技巧，快速生产视频内容并变现赚美金",
+    "tags": ["AI技术", "视频创作", "国际变现", "高效"]
+  },
+  {
+    "id": "proj_6",
+    "date": "2024-12-04",
+    "title": "分享一个普通人通过小红书稳定接广变现的秘籍",
+    "category": "小红书",
+    "difficulty": "简单",
+    "revenue": null,
+    "featured": false,
+    "description": "小红书接商单变现完整教程，稳定获得广告投放机会",
+    "tags": ["小红书", "接单", "广告投放", "稳定收入"]
+  },
+  {
+    "id": "proj_7",
+    "date": "2024-11-27",
+    "title": "5000元启动，首月10倍回本，分享一个小而美的蓝海生意",
+    "category": "蓝海项目",
+    "difficulty": "中等",
+    "revenue": "10倍回本",
+    "featured": true,
+    "description": "仅需5000元启动资金的蓝海生意，首月实现10倍回本的案例分享",
+    "tags": ["低成本", "高回报", "蓝海", "小而美"]
+  },
+  {
+    "id": "proj_8",
+    "date": "2024-11-26",
+    "title": "一个月3亿广告费，普通人靠接商单赶上AI新风口",
+    "category": "接单",
+    "difficulty": "简单",
+    "revenue": null,
+    "featured": true,
+    "description": "AI领域商单爆炸，普通人通过接商单实现快速变现的新风口",
+    "tags": ["AI风口", "接单", "商单爆炸", "普通人"]
+  },
+  {
+    "id": "proj_9",
+    "date": "2024-11-12",
+    "title": "佣金25%，3天出单的短视频带货项目，适合新手赚到第一块钱",
+    "category": "短视频",
+    "difficulty": "简单",
+    "revenue": null,
+    "featured": false,
+    "description": "短视频带货高佣金（25%）且快速出单（3天）的项目，适合新手快速入门",
+    "tags": ["短视频", "带货", "高佣金", "快速出单"]
+  },
+  {
+    "id": "proj_10",
+    "date": "2024-10-29",
+    "title": "做了3年小红书，分享从0到1的起号变现路径",
+    "category": "小红书",
+    "difficulty": "中等",
+    "revenue": null,
+    "featured": true,
+    "description": "3年小红书运营经验总结，完整分享从0粉到变现的全过程",
+    "tags": ["小红书", "运营经验", "完整路径", "3年心得"]
+  },
+  {
+    "id": "proj_11",
+    "date": "2024-09-04",
+    "title": "年轻人在闲鱼疯狂赚钱，分享4类适合新手的搞钱趋势",
+    "category": "闲鱼",
+    "difficulty": "简单",
+    "revenue": null,
+    "featured": false,
+    "description": "闲鱼平台4大赚钱趋势分析，年轻人都在做的搞钱项目",
+    "tags": ["闲鱼", "趋势分析", "新手友好", "多个类别"]
+  },
+  {
+    "id": "proj_12",
+    "date": "2024-07-31",
+    "title": "低成本可复制的项目，从家附近的小吃摊就可以入手",
+    "category": "餐饮",
+    "difficulty": "中等",
+    "revenue": null,
+    "featured": false,
+    "description": "从身边小吃摊开始的低成本创业项目，可复制性强",
+    "tags": ["低成本", "可复制", "本地", "小吃"]
+  },
+  {
+    "id": "proj_13",
+    "date": "2024-07-17",
+    "title": "随手拍就能出单赚钱的项目，适合普通人开启从0-1",
+    "category": "蓝海项目",
+    "difficulty": "简单",
+    "revenue": null,
+    "featured": false,
+    "description": "随时随地拍照就能赚钱的项目，0基础普通人也能做",
+    "tags": ["摄影", "简单易做", "零基础", "即时收入"]
+  },
+  {
+    "id": "proj_14",
+    "date": "2024-07-05",
+    "title": "分享一个适合暑期布局的定制项目，成本低、复购高",
+    "category": "蓝海项目",
+    "difficulty": "中等",
+    "revenue": null,
+    "featured": false,
+    "description": "暑期创业项目，定制化商品低成本高复购率",
+    "tags": ["定制", "暑期", "低成本", "高复购"]
+  },
+  {
+    "id": "proj_15",
+    "date": "2024-07-04",
+    "title": "分享一个小而美的蓝海生意，毛利35%，线上线下都能做",
+    "category": "蓝海项目",
+    "difficulty": "中等",
+    "revenue": null,
+    "featured": false,
+    "description": "毛利35%的小而美蓝海生意，支持线上线下双渠道运营",
+    "tags": ["蓝海", "高毛利", "O2O", "可扩展"]
+  },
+  {
+    "id": "proj_16",
+    "date": "2024-06-19",
+    "title": "普通人怎么快速上手小红书聚光投放？",
+    "category": "小红书",
+    "difficulty": "中等",
+    "revenue": null,
+    "featured": false,
+    "description": "小红书聚光投放快速入门指南，普通人也能轻松掌握",
+    "tags": ["小红书", "投放", "广告", "新手教程"]
+  },
+  {
+    "id": "proj_17",
+    "date": "2024-06-14",
+    "title": "分享我低成本实现睡后收入的方法，新人也适合",
+    "category": "蓝海项目",
+    "difficulty": "简单",
+    "revenue": null,
+    "featured": false,
+    "description": "低成本建立睡后收入系统的方法论，新人也能快速上手",
+    "tags": ["睡后收入", "被动收入", "低成本", "新人友好"]
+  },
+  {
+    "id": "proj_18",
+    "date": "2024-05-15",
+    "title": "可以一直做的低成本蓝海项目，适合新人练手",
+    "category": "蓝海项目",
+    "difficulty": "简单",
+    "revenue": null,
+    "featured": false,
+    "description": "长期可做的低成本蓝海项目，特别适合新人练手和积累经验",
+    "tags": ["低成本", "长期项目", "新人练手", "蓝海"]
+  },
+  {
+    "id": "proj_19",
+    "date": "2024-04-30",
+    "title": "父母也能上手，分享一个适合普通人实操的蓝海项目",
+    "category": "蓝海项目",
+    "difficulty": "简单",
+    "revenue": null,
+    "featured": false,
+    "description": "连父母都能做的蓝海项目，适合普通人实操，无需特殊技能",
+    "tags": ["蓝海", "普通人", "中老年友好", "易上手"]
+  },
+  {
+    "id": "proj_20",
+    "date": "2024-03-19",
+    "title": "一个人也能做的低成本小生意，变现了20万",
+    "category": "蓝海项目",
+    "difficulty": "中等",
+    "revenue": "20万+",
+    "featured": true,
+    "description": "一个人运营的低成本小生意，真实案例分享如何变现20万+",
+    "tags": ["一个人创业", "低成本", "真实案例", "高变现"]
+  }
+]

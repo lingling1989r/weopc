@@ -1,0 +1,31 @@
+{
+  "name": "weopc",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WEOPC.ORG - Flexible Work & Side Gig Platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "db:migrate": "cd apps/api && pnpm prisma migrate dev",
+    "db:seed": "cd apps/api && pnpm prisma db seed",
+    "db:studio": "cd apps/api && pnpm prisma studio"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "axios": "^1.6.7",
+    "tsx": "^4.7.1",
+    "turbo": "^1.13.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}

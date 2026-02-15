@@ -1,0 +1,383 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  PROVIDER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+}
+
+enum ProjectType {
+  FULL_TIME
+  PART_TIME
+  FREELANCE
+  SIDE_GIG
+  INTERNSHIP
+}
+
+enum RevenueTier {
+  TIER_0_1K
+  TIER_1K_5K
+  TIER_5K_10K
+  TIER_10K_30K
+  TIER_30K_50K
+  TIER_50K_100K
+  TIER_100K_PLUS
+}
+
+enum ExecutionRequirement {
+  REMOTE
+  ONSITE
+  HYBRID
+  FLEXIBLE
+}
+
+enum ProjectStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  REJECTED
+  PAUSED
+  CLOSED
+  ARCHIVED
+}
+
+enum LeadStatus {
+  PENDING
+  CONTACTED
+  IN_PROGRESS
+  ACCEPTED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
+
+enum ReviewType {
+  PROJECT_REVIEW
+  USER_REVIEW
+}
+
+enum BlogPostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum InvitationCodeStatus {
+  ACTIVE
+  USED
+  EXPIRED
+  REVOKED
+}
+
+enum PointsActionType {
+  COMMENT_HELPFUL
+  BLOG_PUBLISHED
+  PROJECT_COMPLETED
+  REVIEW_RECEIVED
+  ADMIN_REWARD
+}
+
+model User {
+  id            String     @id @default(uuid())
+  email         String     @unique
+  phone         String?    @unique
+  passwordHash  String
+  username      String     @unique
+  displayName   String?
+  avatar        String?
+  bio           String?
+  role          UserRole   @default(USER)
+  status        UserStatus @default(PENDING_VERIFICATION)
+  emailVerified Boolean    @default(false)
+  phoneVerified Boolean    @default(false)
+
+  // OAuth fields (for future WeChat integration)
+  wechatOpenId  String?    @unique
+  wechatUnionId String?    @unique
+
+  // Points system
+  points        Int        @default(0)
+
+  // Invitation code for PROVIDER registration
+  invitationCodeId String?   @unique
+  invitationCode   InvitationCode? @relation(fields: [invitationCodeId], references: [id], onDelete: SetNull)
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  // Relations
+  projects      Project[]
+  leads         Lead[]
+  reviewsGiven  Review[]   @relation("ReviewerRelation")
+  reviewsReceived Review[] @relation("TargetUserRelation")
+  links         Link[]
+  blogPosts     BlogPost[]
+  comments      Comment[]
+  pointsHistory UserPoints[]
+  generatedInvitations InvitationCode[] @relation("GeneratedBy")
+
+  @@index([email])
+  @@index([username])
+  @@index([role])
+  @@index([status])
+  @@index([points])
+}
+
+model Project {
+  id                String                @id @default(uuid())
+  title             String
+  description       String
+  shortDescription  String?
+  type              ProjectType
+  category          String
+  tags              String[]
+  revenueTier       RevenueTier
+  executionReq      ExecutionRequirement
+  duration          String?
+  skillsRequired    String[]
+  experienceLevel   String?
+  location          String?
+  city              String?
+  province          String?
+  status            ProjectStatus         @default(DRAFT)
+  featured          Boolean               @default(false)
+  viewCount         Int                   @default(0)
+
+  // Provider info
+  providerId        String
+  provider          User                  @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  contactEmail      String?
+  contactPhone      String?
+  contactWechat     String?
+
+  // Review/Moderation
+  rejectionReason   String?
+  reviewedAt        DateTime?
+  reviewedBy        String?
+
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+
+  // Relations
+  leads             Lead[]
+  reviews           Review[]
+  comments          Comment[]
+
+  @@index([providerId])
+  @@index([status])
+  @@index([type])
+  @@index([category])
+  @@index([revenueTier])
+  @@index([city])
+  @@index([featured])
+  @@index([createdAt])
+}
+
+model Lead {
+  id              String      @id @default(uuid())
+  projectId       String
+  project         Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  coverLetter     String?
+  resume          String?
+  portfolio       String?
+  expectedRate    String?
+  availability    String?
+  status          LeadStatus  @default(PENDING)
+  notes           String?     // Provider's notes
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+  @@index([status])
+}
+
+model Review {
+  id            String      @id @default(uuid())
+  type          ReviewType
+
+  // Optional project reference
+  projectId     String?
+  project       Project?    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // Reviewer and target user
+  reviewerId    String
+  reviewer      User        @relation("ReviewerRelation", fields: [reviewerId], references: [id], onDelete: Cascade)
+  targetUserId  String
+  targetUser    User        @relation("TargetUserRelation", fields: [targetUserId], references: [id], onDelete: Cascade)
+
+  rating        Int         // 1-5
+  title         String?
+  content       String
+  verified      Boolean     @default(false)
+  published     Boolean     @default(true)
+  flagged       Boolean     @default(false)
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([projectId])
+  @@index([reviewerId])
+  @@index([targetUserId])
+  @@index([published])
+}
+
+model Link {
+  id            String    @id @default(uuid())
+  originalUrl   String
+  shortCode     String    @unique
+  customAlias   String?   @unique
+
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  clickCount    Int       @default(0)
+  lastClickedAt DateTime?
+  expiresAt     DateTime?
+  password      String?
+  maxClicks     Int?
+  title         String?
+  description   String?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([shortCode])
+  @@index([userId])
+}
+
+model BlogPost {
+  id              String          @id @default(uuid())
+  title           String
+  slug            String          @unique
+  content         String
+  excerpt         String?
+  coverImage      String?
+
+  authorId        String
+  author          User            @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  category        String?
+  tags            String[]
+  status          BlogPostStatus  @default(DRAFT)
+  featured        Boolean         @default(false)
+  viewCount       Int             @default(0)
+
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+
+  publishedAt     DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([authorId])
+  @@index([slug])
+  @@index([status])
+  @@index([featured])
+  @@index([publishedAt])
+}
+
+model Comment {
+  id              String    @id @default(uuid())
+  content         String
+
+  projectId       String
+  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  authorId        String
+  author          User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  helpful         Int       @default(0)  // Number of users who marked as helpful
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([projectId])
+  @@index([authorId])
+  @@index([createdAt])
+}
+
+model InvitationCode {
+  id              String                  @id @default(uuid())
+  code            String                  @unique
+  status          InvitationCodeStatus    @default(ACTIVE)
+
+  generatedById   String
+  generatedBy     User                    @relation("GeneratedBy", fields: [generatedById], references: [id], onDelete: Cascade)
+
+  usedBy          User?
+
+  expiresAt       DateTime?
+  usedAt          DateTime?
+
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  @@index([code])
+  @@index([status])
+  @@index([generatedById])
+}
+
+model UserPoints {
+  id              String              @id @default(uuid())
+  userId          String
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  actionType      PointsActionType
+  points          Int
+  description     String?
+
+  relatedId       String?  // ID of related resource (comment, blog, etc)
+
+  createdAt       DateTime            @default(now())
+
+  @@index([userId])
+  @@index([actionType])
+  @@index([createdAt])
+}
+
+model SystemConfig {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  resource  String
+  details   String?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}

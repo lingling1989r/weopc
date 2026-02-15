@@ -1,0 +1,65 @@
+{
+  "timestamp": "2026-02-14T14:41:49.733Z",
+  "summary": {
+    "total": 7,
+    "passed": 5,
+    "failed": 1,
+    "warnings": 1,
+    "successRate": "71.43%"
+  },
+  "results": [
+    {
+      "name": "首页",
+      "url": "http://localhost:3003/",
+      "status": "WARNING",
+      "issues": [
+        "页面显示加载动画（可能是正常的客户端渲染）"
+      ],
+      "httpStatus": 200
+    },
+    {
+      "name": "登录页面",
+      "url": "http://localhost:3003/login",
+      "status": "PASS",
+      "issues": [],
+      "httpStatus": 200
+    },
+    {
+      "name": "注册页面",
+      "url": "http://localhost:3003/register",
+      "status": "PASS",
+      "issues": [],
+      "httpStatus": 200
+    },
+    {
+      "name": "项目列表页面",
+      "url": "http://localhost:3003/projects",
+      "status": "PASS",
+      "issues": [],
+      "httpStatus": 200
+    },
+    {
+      "name": "Provider Dashboard",
+      "url": "http://localhost:3003/dashboard/provider",
+      "status": "PASS",
+      "issues": [],
+      "httpStatus": 200
+    },
+    {
+      "name": "Admin Dashboard",
+      "url": "http://localhost:3003/dashboard/admin",
+      "status": "PASS",
+      "issues": [],
+      "httpStatus": 200
+    },
+    {
+      "name": "404 页面",
+      "url": "http://localhost:3003/this-page-does-not-exist-12345",
+      "status": "FAIL",
+      "issues": [
+        "HTTP 状态码: 404 (预期: 200)"
+      ],
+      "httpStatus": 404
+    }
+  ]
+}
