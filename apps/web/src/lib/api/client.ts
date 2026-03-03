@@ -89,6 +89,7 @@ export const showcaseApi = {
   getAllProjects: (params?: any) => publicApiClient.get('/showcase/all', { params }),
   getPolicies: () => publicApiClient.get('/showcase/policies'),
   getCategories: () => publicApiClient.get('/showcase/categories'),
+  getProjectById: (id: string) => publicApiClient.get(`/showcase/${id}`),
 };
 
 // Admin API
@@ -99,4 +100,14 @@ export const adminApi = {
   rejectProject: (id: string, reason: string) =>
     authenticatedApiClient.post(`/admin/projects/${id}/reject`, { reason }),
   getStats: () => authenticatedApiClient.get('/admin/stats'),
+  getUsers: (params?: any) => authenticatedApiClient.get('/admin/users', { params }),
+  getUserById: (id: string) => authenticatedApiClient.get(`/admin/users/${id}`),
+  certifyUser: (id: string, certified: boolean) =>
+    authenticatedApiClient.patch(`/admin/users/${id}/certify`, { certified }),
+};
+
+// Users API
+export const usersApi = {
+  getMyPoints: () => authenticatedApiClient.get('/users/me/points'),
+  getUserPoints: (id: string) => publicApiClient.get(`/users/${id}/points`),
 };

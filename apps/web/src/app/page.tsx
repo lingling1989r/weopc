@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ProjectList } from '@/components/features/ProjectList';
+import { ShowcaseList } from '@/components/features/ShowcaseList';
 import { PoliciesSection } from '@/components/features/PoliciesSection';
 import { CategoriesSection } from '@/components/features/CategoriesSection';
 import { useProtectedAction } from '@/lib/hooks/useProtectedAction';
@@ -59,6 +60,17 @@ export default function HomePage() {
 
       {/* Categories Section */}
       <CategoriesSection />
+
+      {/* Showcase Section */}
+      <section className="container mx-auto px-4 py-12">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-3xl font-bold">精选案例</h2>
+          <a href="/showcase" className="text-blue-600 hover:underline text-sm">
+            查看全部 →
+          </a>
+        </div>
+        <ShowcaseList limit={6} featured />
+      </section>
 
       {/* Projects Section */}
       <section

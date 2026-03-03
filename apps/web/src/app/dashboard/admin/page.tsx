@@ -138,6 +138,16 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* Quick Links */}
+        <div className="flex gap-4 mb-8">
+          <a
+            href="/dashboard/admin/users"
+            className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+          >
+            用户管理
+          </a>
+        </div>
+
         {/* Statistics Cards */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">

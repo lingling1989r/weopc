@@ -222,4 +222,39 @@ router.get('/categories', (req, res) => {
   }
 });
 
+// 获取单个项目详情
+router.get('/:id', (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const project = featuredProjects.find(p => p.id === projectId);
+
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: '项目不存在'
+        }
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: project,
+      meta: {
+        timestamp: new Date().toISOString()
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching project:', error);
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: 'FETCH_ERROR',
+        message: '获取项目详情失败'
+      }
+    });
+  }
+});
+
 export default router;

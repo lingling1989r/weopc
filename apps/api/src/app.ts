@@ -12,6 +12,7 @@ import showcaseRoutes from './modules/showcase/routes';
 import invitationRoutes from './modules/invitation/routes';
 import adminRoutes from './modules/admin/routes';
 import userRoutes from './modules/users/routes';
+import reviewRoutes from './modules/reviews/routes';
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1', leadRoutes);
 app.use('/api/v1/showcase', showcaseRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/reviews', reviewRoutes);
 
 // 404 handler
 app.use((req, res) => {

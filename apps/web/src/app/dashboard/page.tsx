@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { useAuthStore } from '@/lib/store/auth';
-import { leadsApi, authApi } from '@/lib/api/client';
+import { leadsApi, authApi, usersApi } from '@/lib/api/client';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -39,11 +39,35 @@ export default function DashboardPage() {
     enabled: isAuthenticated(),
   });
 
+  // Fetch user's points & level
+  const { data: pointsData, isLoading: pointsLoading } = useQuery({
+    queryKey: ['user', 'me', 'points'],
+    queryFn: async () => {
+      const response = await usersApi.getMyPoints();
+      return response.data.data;
+    },
+    enabled: isAuthenticated(),
+  });
+
   if (!isAuthenticated()) {
     return null;
   }
 
   const leads = leadsData || [];
+
+  const levelLabels: Record<string, string> = {
+    NORMAL: '普通用户',
+    OFFICIAL: '官方认证',
+    GOLD: '黄金用户',
+    KING: '王者用户',
+  };
+
+  const levelColors: Record<string, string> = {
+    NORMAL: 'bg-gray-100 text-gray-700',
+    OFFICIAL: 'bg-blue-100 text-blue-700',
+    GOLD: 'bg-yellow-100 text-yellow-700',
+    KING: 'bg-purple-100 text-purple-700',
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -90,6 +114,59 @@ export default function DashboardPage() {
                 >
                   编辑个人资料 →
                 </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Level & Points Card */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">我的等级与积分</h2>
+          {pointsLoading ? (
+            <div className="animate-pulse space-y-3">
+              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+            </div>
+          ) : pointsData ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <div className="text-sm text-gray-500 mb-1">当前等级</div>
+                <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${levelColors[pointsData.level] || 'bg-gray-100 text-gray-700'}`}>
+                  {levelLabels[pointsData.level] || pointsData.level}
+                </span>
+              </div>
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <div className="text-sm text-gray-500 mb-1">积分</div>
+                <div className="text-3xl font-bold text-blue-600">{pointsData.points}</div>
+              </div>
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <div className="text-sm text-gray-500 mb-1">平均评分</div>
+                <div className="text-2xl font-bold text-yellow-500">
+                  {pointsData.avgRating > 0 ? pointsData.avgRating.toFixed(1) : '-'}
+                </div>
+              </div>
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <div className="text-sm text-gray-500 mb-1">收到评价</div>
+                <div className="text-3xl font-bold text-green-600">{pointsData.reviewCount}</div>
+              </div>
+            </div>
+          ) : (
+            <p className="text-gray-400 text-sm">暂无积分数据</p>
+          )}
+
+          {/* Recent Points History */}
+          {pointsData?.recentHistory && pointsData.recentHistory.length > 0 && (
+            <div className="mt-4 pt-4 border-t">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">最近积分记录</h3>
+              <div className="space-y-2">
+                {pointsData.recentHistory.slice(0, 5).map((item: any) => (
+                  <div key={item.id} className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">{item.description || item.actionType}</span>
+                    <span className={`font-semibold ${item.points >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                      {item.points >= 0 ? '+' : ''}{item.points}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           )}

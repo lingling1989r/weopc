@@ -82,4 +82,80 @@ router.patch('/me', authenticate, async (req: AuthRequest, res, next) => {
   }
 });
 
+// Get current user points and level info
+router.get('/me/points', authenticate, async (req: AuthRequest, res, next) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user!.id },
+      select: {
+        id: true,
+        points: true,
+        level: true,
+        avgRating: true,
+        reviewCount: true,
+        officialCertifiedAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    const recentHistory = await prisma.userPoints.findMany({
+      where: { userId: req.user!.id },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+      select: {
+        id: true,
+        actionType: true,
+        points: true,
+        description: true,
+        relatedId: true,
+        createdAt: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      data: {
+        ...user,
+        recentHistory,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get a user's points and level info (public)
+router.get('/:id/points', async (req, res, next) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.params.id },
+      select: {
+        id: true,
+        username: true,
+        displayName: true,
+        avatar: true,
+        points: true,
+        level: true,
+        avgRating: true,
+        reviewCount: true,
+        officialCertifiedAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    res.json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;

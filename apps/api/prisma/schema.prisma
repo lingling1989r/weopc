@@ -16,6 +16,13 @@ enum UserRole {
   ADMIN
 }
 
+enum UserLevel {
+  NORMAL     // 普通用户
+  OFFICIAL   // 官方认证用户
+  GOLD       // 黄金用户
+  KING       // 王者用户
+}
+
 enum UserStatus {
   ACTIVE
   INACTIVE
@@ -115,6 +122,18 @@ model User {
   // Points system
   points        Int        @default(0)
 
+  // Rating stats (updated on review received)
+  avgRating     Float      @default(0)
+  reviewCount   Int        @default(0)
+
+  // User level system
+  level         UserLevel  @default(NORMAL)
+  levelExpiresAt DateTime?  // 会员到期时间
+
+  // Official certification info
+  officialCertifiedAt DateTime?
+  certifiedBy         String?
+
   // Invitation code for PROVIDER registration
   invitationCodeId String?   @unique
   invitationCode   InvitationCode? @relation(fields: [invitationCodeId], references: [id], onDelete: SetNull)
@@ -138,6 +157,9 @@ model User {
   @@index([role])
   @@index([status])
   @@index([points])
+  @@index([level])
+  @@index([avgRating])
+  @@index([reviewCount])
 }
 
 model Project {
