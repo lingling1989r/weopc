@@ -128,27 +128,78 @@ export default function DashboardPage() {
               <div className="h-4 bg-gray-200 rounded w-1/3"></div>
             </div>
           ) : pointsData ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="text-sm text-gray-500 mb-1">当前等级</div>
-                <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${levelColors[pointsData.level] || 'bg-gray-100 text-gray-700'}`}>
-                  {levelLabels[pointsData.level] || pointsData.level}
-                </span>
-              </div>
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="text-sm text-gray-500 mb-1">积分</div>
-                <div className="text-3xl font-bold text-blue-600">{pointsData.points}</div>
-              </div>
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="text-sm text-gray-500 mb-1">平均评分</div>
-                <div className="text-2xl font-bold text-yellow-500">
-                  {pointsData.avgRating > 0 ? pointsData.avgRating.toFixed(1) : '-'}
+            <div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <div className="text-sm text-gray-500 mb-1">当前等级</div>
+                  <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${levelColors[pointsData.level] || 'bg-gray-100 text-gray-700'}`}>
+                    {levelLabels[pointsData.level] || pointsData.level}
+                  </span>
+                </div>
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <div className="text-sm text-gray-500 mb-1">积分</div>
+                  <div className="text-3xl font-bold text-blue-600">{pointsData.points}</div>
+                </div>
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <div className="text-sm text-gray-500 mb-1">平均评分</div>
+                  <div className="text-2xl font-bold text-yellow-500">
+                    {pointsData.avgRating > 0 ? pointsData.avgRating.toFixed(1) : '-'}
+                  </div>
+                </div>
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <div className="text-sm text-gray-500 mb-1">收到评价</div>
+                  <div className="text-3xl font-bold text-green-600">{pointsData.reviewCount}</div>
                 </div>
               </div>
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="text-sm text-gray-500 mb-1">收到评价</div>
-                <div className="text-3xl font-bold text-green-600">{pointsData.reviewCount}</div>
-              </div>
+
+              {/* Level Progress Bar */}
+              {(() => {
+                const level = pointsData.level;
+                const points = pointsData.points;
+                if (level === 'KING') {
+                  return (
+                    <div className="mt-4 p-4 bg-purple-50 rounded-lg">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-semibold text-purple-700">已达最高等级 王者用户</span>
+                      </div>
+                      <div className="w-full bg-purple-200 rounded-full h-2">
+                        <div className="bg-purple-600 h-2 rounded-full w-full" />
+                      </div>
+                    </div>
+                  );
+                }
+                if (level === 'GOLD') {
+                  const needed = 500;
+                  const pct = Math.min(100, Math.round((points / needed) * 100));
+                  const remaining = Math.max(0, needed - points);
+                  return (
+                    <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-semibold text-yellow-700">距王者还需 {remaining} 积分</span>
+                        <span className="text-xs text-yellow-600">{points} / {needed} 分（还需评分 ≥ 4.5 且评价 ≥ 10 次）</span>
+                      </div>
+                      <div className="w-full bg-yellow-200 rounded-full h-2">
+                        <div className="bg-yellow-500 h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                      </div>
+                    </div>
+                  );
+                }
+                // NORMAL or OFFICIAL — show progress towards GOLD
+                const needed = 200;
+                const pct = Math.min(100, Math.round((points / needed) * 100));
+                const remaining = Math.max(0, needed - points);
+                return (
+                  <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-semibold text-blue-700">距黄金还需 {remaining} 积分</span>
+                      <span className="text-xs text-blue-600">{points} / {needed} 分（还需平均评分 ≥ 4.0）</span>
+                    </div>
+                    <div className="w-full bg-blue-200 rounded-full h-2">
+                      <div className="bg-blue-500 h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           ) : (
             <p className="text-gray-400 text-sm">暂无积分数据</p>

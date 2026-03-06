@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../../database/prisma/client';
-import { authenticate, requireRole, AuthRequest } from '../../shared/middleware/auth';
+import { authenticate, optionalAuthenticate, requireRole, AuthRequest } from '../../shared/middleware/auth';
 import { ValidationError, NotFoundError, ForbiddenError } from '../../shared/utils/errors';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 // Validation schemas
 const createProjectSchema = z.object({
@@ -128,8 +128,44 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-// Get project by ID (public)
-router.get('/:id', async (req, res, next) => {
+// Get my projects (PROVIDER and ADMIN only) — must be before /:id to avoid shadowing
+router.get('/my', authenticate, requireRole(['PROVIDER', 'ADMIN']), async (req: AuthRequest, res, next) => {
+  try {
+    const userId = req.user!.id;
+    const userRole = req.user!.role;
+
+    // ADMIN can see all projects, PROVIDER can only see their own
+    const where: any = userRole === 'ADMIN' ? {} : { providerId: userId };
+
+    const projects = await prisma.project.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        provider: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+            avatar: true,
+          },
+        },
+        _count: {
+          select: { leads: true },
+        },
+      },
+    });
+
+    res.json({
+      success: true,
+      data: projects,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get project by ID (public, but contact info requires auth)
+router.get('/:id', optionalAuthenticate, async (req: AuthRequest, res, next) => {
   try {
     const project = await prisma.project.findUnique({
       where: { id: req.params.id },
@@ -159,9 +195,17 @@ router.get('/:id', async (req, res, next) => {
       data: { viewCount: { increment: 1 } },
     });
 
+    // Hide contact info for unauthenticated users
+    const data: any = { ...project };
+    if (!req.user) {
+      data.contactEmail = null;
+      data.contactPhone = null;
+      data.contactWechat = null;
+    }
+
     res.json({
       success: true,
-      data: project,
+      data,
     });
   } catch (error) {
     next(error);
@@ -250,42 +294,6 @@ router.patch('/:id', authenticate, requireRole(['PROVIDER', 'ADMIN']), async (re
     } else {
       next(error);
     }
-  }
-});
-
-// Get my projects (PROVIDER and ADMIN only)
-router.get('/my', authenticate, requireRole(['PROVIDER', 'ADMIN']), async (req: AuthRequest, res, next) => {
-  try {
-    const userId = req.user!.id;
-    const userRole = req.user!.role;
-
-    // ADMIN can see all projects, PROVIDER can only see their own
-    const where: any = userRole === 'ADMIN' ? {} : { providerId: userId };
-
-    const projects = await prisma.project.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        provider: {
-          select: {
-            id: true,
-            username: true,
-            displayName: true,
-            avatar: true,
-          },
-        },
-        _count: {
-          select: { leads: true },
-        },
-      },
-    });
-
-    res.json({
-      success: true,
-      data: projects,
-    });
-  } catch (error) {
-    next(error);
   }
 });
 

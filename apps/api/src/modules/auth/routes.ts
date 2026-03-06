@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { type Secret, type SignOptions } from 'jsonwebtoken';
 import { prisma } from '../../database/prisma/client';
 import { config } from '../../config';
 import { ValidationError, UnauthorizedError, ConflictError } from '../../shared/utils/errors';
 import { authenticate, AuthRequest } from '../../shared/middleware/auth';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 // Validation schemas
 const registerSchema = z.object({
@@ -23,6 +23,11 @@ const loginSchema = z.object({
   email: z.string().email(),
   password: z.string(),
 });
+
+const jwtSecret: Secret = config.jwt.secret;
+const jwtSignOptions: SignOptions = {
+  expiresIn: config.jwt.expiresIn as SignOptions['expiresIn'],
+};
 
 // Register
 router.post('/register', async (req, res, next) => {
@@ -136,8 +141,8 @@ router.post('/register', async (req, res, next) => {
     // Generate token
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
-      config.jwt.secret,
-      { expiresIn: config.jwt.expiresIn }
+      jwtSecret,
+      jwtSignOptions
     );
 
     res.status(201).json({
@@ -185,8 +190,8 @@ router.post('/login', async (req, res, next) => {
     // Generate token
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
-      config.jwt.secret,
-      { expiresIn: config.jwt.expiresIn }
+      jwtSecret,
+      jwtSignOptions
     );
 
     res.json({

@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, type NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../../config';
 import { UnauthorizedError, ForbiddenError } from '../utils/errors';
@@ -14,7 +14,7 @@ export interface AuthRequest extends Request {
 
 export const authenticate = (
   req: AuthRequest,
-  res: Response,
+  _res: unknown,
   next: NextFunction
 ) => {
   try {
@@ -42,8 +42,35 @@ export const authenticate = (
   }
 };
 
+export const optionalAuthenticate = (
+  req: AuthRequest,
+  _res: unknown,
+  next: NextFunction
+) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return next();
+    }
+
+    const token = authHeader.substring(7);
+    const decoded = jwt.verify(token, config.jwt.secret) as {
+      id: string;
+      email: string;
+      role: UserRole;
+    };
+
+    req.user = decoded;
+    next();
+  } catch (error) {
+    // Invalid token — treat as unauthenticated
+    next();
+  }
+};
+
 export const requireRole = (roles: UserRole[]) => {
-  return (req: AuthRequest, res: Response, next: NextFunction) => {
+  return (req: AuthRequest, _res: unknown, next: NextFunction) => {
     if (!req.user) {
       return next(new UnauthorizedError());
     }

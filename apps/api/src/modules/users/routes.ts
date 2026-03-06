@@ -4,7 +4,7 @@ import { prisma } from '../../database/prisma/client';
 import { authenticate, AuthRequest } from '../../shared/middleware/auth';
 import { ValidationError, NotFoundError } from '../../shared/utils/errors';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 // Validation schema
 const updateProfileSchema = z.object({

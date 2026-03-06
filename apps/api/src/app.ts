@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { type Express } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { config } from './config';
@@ -13,8 +13,10 @@ import invitationRoutes from './modules/invitation/routes';
 import adminRoutes from './modules/admin/routes';
 import userRoutes from './modules/users/routes';
 import reviewRoutes from './modules/reviews/routes';
+import preferenceRoutes from './modules/preferences/routes';
+import recommendationRoutes from './modules/recommendations/routes';
 
-const app = express();
+const app: Express = express();
 
 // Middleware
 app.use(helmet());
@@ -23,7 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
@@ -36,9 +38,11 @@ app.use('/api/v1', leadRoutes);
 app.use('/api/v1/showcase', showcaseRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
+app.use('/api/v1/preferences', preferenceRoutes);
+app.use('/api/v1/recommendations', recommendationRoutes);
 
 // 404 handler
-app.use((req, res) => {
+app.use((_req, res) => {
   res.status(404).json({
     success: false,
     error: {

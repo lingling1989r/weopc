@@ -2,10 +2,10 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../../database/prisma/client';
 import { authenticate, AuthRequest } from '../../shared/middleware/auth';
-import { ValidationError, NotFoundError, ForbiddenError } from '../../shared/utils/errors';
+import { ValidationError, NotFoundError } from '../../shared/utils/errors';
 import { processReviewPoints } from '../points/service';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 const createReviewSchema = z.object({
   type: z.enum(['PROJECT_REVIEW', 'USER_REVIEW']),

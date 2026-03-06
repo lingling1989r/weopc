@@ -1,4 +1,4 @@
-import { PrismaClient, ProjectType, RevenueTier, ExecutionRequirement } from '@prisma/client';
+import { PrismaClient, ProjectType, RevenueTier } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as bcryptjs from 'bcryptjs';

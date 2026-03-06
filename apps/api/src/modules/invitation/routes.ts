@@ -3,9 +3,9 @@ import { z } from 'zod';
 import crypto from 'crypto';
 import { prisma } from '../../database/prisma/client';
 import { authenticate, requireRole, AuthRequest } from '../../shared/middleware/auth';
-import { ValidationError, UnauthorizedError, ForbiddenError, NotFoundError } from '../../shared/utils/errors';
+import { ValidationError, ForbiddenError, NotFoundError } from '../../shared/utils/errors';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 // Constants
 const INVITATION_CODE_LENGTH = 8;

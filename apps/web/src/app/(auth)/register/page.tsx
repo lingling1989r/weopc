@@ -1,15 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { authApi } from '@/lib/api/client';
 import { useAuthStore } from '@/lib/store/auth';
 
-export default function RegisterPage() {
+function RegisterPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const defaultRole = searchParams.get('role') as 'USER' | 'PROVIDER' || 'USER';
+  const defaultRole = (searchParams.get('role') as 'USER' | 'PROVIDER') || 'USER';
 
   const [formData, setFormData] = useState({
     email: '',
@@ -23,6 +23,10 @@ export default function RegisterPage() {
   const [invitationCodeValid, setInvitationCodeValid] = useState<boolean | null>(null);
   const [invitationCodeError, setInvitationCodeError] = useState('');
   const setAuth = useAuthStore((state) => state.setAuth);
+
+  useEffect(() => {
+    setFormData((prev) => ({ ...prev, role: defaultRole }));
+  }, [defaultRole]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -217,5 +221,13 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+      <RegisterPageContent />
+    </Suspense>
   );
 }

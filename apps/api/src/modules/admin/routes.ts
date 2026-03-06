@@ -2,9 +2,9 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../../database/prisma/client';
 import { authenticate, requireRole, AuthRequest } from '../../shared/middleware/auth';
-import { ValidationError, NotFoundError, ForbiddenError } from '../../shared/utils/errors';
+import { ValidationError, NotFoundError } from '../../shared/utils/errors';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 // Validation schemas
 const rejectProjectSchema = z.object({
@@ -20,7 +20,7 @@ router.get(
   '/projects/pending',
   authenticate,
   requireRole(['ADMIN']),
-  async (req: AuthRequest, res, next) => {
+  async (_req: AuthRequest, res, next) => {
     try {
       const projects = await prisma.project.findMany({
         where: { status: 'PENDING_REVIEW' },
@@ -218,7 +218,7 @@ router.get(
   '/stats',
   authenticate,
   requireRole(['ADMIN']),
-  async (req: AuthRequest, res, next) => {
+  async (_req: AuthRequest, res, next) => {
     try {
       const [pendingCount, publishedCount, rejectedCount, totalUsers, totalProviders] = await Promise.all([
         prisma.project.count({ where: { status: 'PENDING_REVIEW' } }),

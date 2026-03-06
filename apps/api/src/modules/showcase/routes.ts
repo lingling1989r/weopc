@@ -2,7 +2,7 @@ import { Router } from 'express';
 import path from 'path';
 import fs from 'fs';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 // 加载特色项目数据
 let featuredProjects: any[] = [];
@@ -70,7 +70,7 @@ const case_categories = [
 ];
 
 // 获取广场页面数据（政策+热门项目）
-router.get('/homepage', (req, res) => {
+router.get('/homepage', (_req, res) => {
   try {
     // 获取热门项目（前6个）
     const featured = featuredProjects
@@ -117,7 +117,7 @@ router.get('/homepage', (req, res) => {
 });
 
 // 获取热门项目列表
-router.get('/featured', (req, res) => {
+router.get('/featured', (_req, res) => {
   try {
     const featured = featuredProjects.filter(p => p.featured);
     return res.json({
@@ -177,7 +177,7 @@ router.get('/all', (req, res) => {
 });
 
 // 获取政策信息
-router.get('/policies', (req, res) => {
+router.get('/policies', (_req, res) => {
   try {
     return res.json({
       success: true,
@@ -200,7 +200,7 @@ router.get('/policies', (req, res) => {
 });
 
 // 获取项目分类统计
-router.get('/categories', (req, res) => {
+router.get('/categories', (_req, res) => {
   try {
     return res.json({
       success: true,

@@ -4,7 +4,7 @@ import { prisma } from '../../database/prisma/client';
 import { authenticate, requireRole, AuthRequest } from '../../shared/middleware/auth';
 import { ValidationError, NotFoundError, ForbiddenError, ConflictError } from '../../shared/utils/errors';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 // Validation schema
 const createLeadSchema = z.object({

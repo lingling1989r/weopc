@@ -42,3 +42,20 @@ jobs:
 
       - name: Build
         run: pnpm -r --filter=@weopc/api --filter=@weopc/web build
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to production server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          script: |
+            chmod +x /home/weopc/weopc/deploy/deploy.sh
+            /home/weopc/weopc/deploy/deploy.sh

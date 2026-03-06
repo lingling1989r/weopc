@@ -101,6 +101,22 @@ enum PointsActionType {
   ADMIN_REWARD
 }
 
+model UserPreference {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  skills          String[] // 技能标签: ["写作", "剪辑", "英文", "设计", "编程"]
+  availableTime   String   // 可用时间: "碎片" / "每天2h" / "每天4h" / "全职"
+  budget          String   // 启动预算: "0" / "500" / "1000" / "5000+"
+  interests       String[] // 兴趣方向: ["流量", "电商", "服务", "工具", "内容"]
+  experience      String   // 经验水平: "新手" / "有经验" / "资深"
+  incomeGoal      String   // 收益目标: "零花钱" / "副业收入" / "创业"
+  updatedAt       DateTime @updatedAt
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
 model User {
   id            String     @id @default(uuid())
   email         String     @unique
@@ -151,6 +167,7 @@ model User {
   comments      Comment[]
   pointsHistory UserPoints[]
   generatedInvitations InvitationCode[] @relation("GeneratedBy")
+  preference    UserPreference?
 
   @@index([email])
   @@index([username])
