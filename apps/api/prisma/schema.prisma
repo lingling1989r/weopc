@@ -420,3 +420,57 @@ model AuditLog {
   @@index([action])
   @@index([createdAt])
 }
+
+// ============ 爬虫数据表 ============
+
+model PolicyNews {
+  id          String   @id @default(uuid())
+  title       String
+  content     String?
+  source      String
+  sourceUrl   String   @unique
+  city        String?
+  province    String?
+  category    String   @default("创业政策")
+  publishDate DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([city, province])
+  @@index([category])
+  @@index([publishDate])
+}
+
+model Event {
+  id               String    @id @default(uuid())
+  title            String
+  description      String?
+  source           String
+  sourceUrl        String    @unique
+  eventType        String    @default("比赛")
+  city             String?
+  province         String?
+  location         String?
+  startDate        DateTime?
+  endDate          DateTime?
+  registrationUrl  String?
+  reward           String?
+  status           String    @default("UPCOMING")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([eventType])
+  @@index([city, province])
+  @@index([status])
+  @@index([startDate])
+}
+
+model CrawlerTask {
+  id          String    @id @default(uuid())
+  source      String
+  status      String    @default("RUNNING")
+  itemsCount  Int       @default(0)
+  errorMsg    String?
+  startedAt   DateTime  @default(now())
+  finishedAt  DateTime?
+}

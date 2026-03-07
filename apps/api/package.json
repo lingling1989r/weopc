@@ -10,6 +10,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "seed": "tsx src/database/seed.ts",
+    "crawler": "tsx src/scripts/crawler.ts",
     "test": "jest"
   },
   "dependencies": {
