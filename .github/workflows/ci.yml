@@ -73,6 +73,8 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: ${{ secrets.DEPLOY_PORT }}
           script: |
-            mkdir -p /home/weopc/weopc/deploy
-            chmod +x /home/weopc/weopc/deploy/deploy.sh || true
-            /home/weopc/weopc/deploy/deploy.sh
+            set -e
+            mkdir -p /home/weopc/weopc /home/weopc/weopc-release
+            tar -xzf /home/weopc/weopc-deploy.tar.gz -C /home/weopc/weopc-release
+            chmod +x /home/weopc/weopc-release/deploy/deploy.sh
+            /home/weopc/weopc-release/deploy/deploy.sh

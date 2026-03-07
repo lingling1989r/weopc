@@ -49,8 +49,8 @@ echo "==> Building apps"
 pnpm -r --filter=@weopc/api --filter=@weopc/web build
 
 echo "==> Restarting services"
-pm2 startOrReload "$APP_DIR/deploy/ecosystem.config.js"
-pm2 save
+sudo systemctl restart weopc-api
+sudo systemctl restart weopc-web
 
 echo "==> Cleaning up"
 rm -rf "$TMP_DIR" "$ARCHIVE_PATH"
