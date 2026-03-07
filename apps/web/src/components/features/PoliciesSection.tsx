@@ -1,16 +1,24 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { showcaseApi } from '@/lib/api/client';
+import { publicApiClient } from '@/lib/api/client';
 import { useHydrated } from '@/lib/hooks/useHydrated';
 
 export function PoliciesSection() {
   const isHydrated = useHydrated();
+  
   const { data, isLoading } = useQuery({
     queryKey: ['policies'],
     queryFn: async () => {
-      const response = await showcaseApi.getPolicies();
-      return response.data.data;
+      try {
+        const response = await publicApiClient.get('/information/policy', {
+          params: { limit: 8 },
+        });
+        return response.data.data || [];
+      } catch (e) {
+        console.error('Failed to fetch policies:', e);
+        return [];
+      }
     },
   });
 
@@ -36,12 +44,20 @@ export function PoliciesSection() {
   return (
     <section className="bg-gradient-to-r from-blue-50 to-indigo-50 py-12 border-t border-b border-blue-100">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-8 text-center">政策支持</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-3xl font-bold">政策支持</h2>
+          <a href="/information/policy" className="text-blue-600 hover:underline text-sm">
+            查看全部 →
+          </a>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {data.map((policy: any) => (
-            <div
+          {data.slice(0, 8).map((policy: any) => (
+            <a
               key={policy.id}
-              className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition"
+              href={policy.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition block"
             >
               <div className="flex items-start gap-3 mb-2">
                 <div className="flex-shrink-0">
@@ -59,13 +75,13 @@ export function PoliciesSection() {
                 {policy.title}
               </h3>
               <p className="text-sm text-gray-600 line-clamp-2 mb-2">
-                {policy.description}
+                {policy.content}
               </p>
               <div className="flex items-center justify-between text-xs text-gray-500">
-                <span>{policy.date}</span>
-                <span className="font-medium text-green-600">{policy.impact}</span>
+                <span>{policy.source}</span>
+                {policy.publishDate && <span>{policy.publishDate}</span>}
               </div>
-            </div>
+            </a>
           ))}
         </div>
       </div>

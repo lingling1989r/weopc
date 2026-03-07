@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/Footer';
 import { ProjectList } from '@/components/features/ProjectList';
 import { ShowcaseList } from '@/components/features/ShowcaseList';
 import { PoliciesSection } from '@/components/features/PoliciesSection';
+import { EventsSection } from '@/components/features/EventsSection';
 import { CategoriesSection } from '@/components/features/CategoriesSection';
 import { useProtectedAction } from '@/lib/hooks/useProtectedAction';
 
