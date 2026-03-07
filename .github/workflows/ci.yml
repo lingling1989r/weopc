@@ -74,7 +74,12 @@ jobs:
           port: ${{ secrets.DEPLOY_PORT }}
           script: |
             set -e
+            rm -rf /home/weopc/weopc-release
             mkdir -p /home/weopc/weopc /home/weopc/weopc-release
             tar -xzf /home/weopc/weopc-deploy.tar.gz -C /home/weopc/weopc-release
-            chmod +x /home/weopc/weopc-release/deploy/deploy.sh
-            /home/weopc/weopc-release/deploy/deploy.sh
+            RELEASE_DIR=/home/weopc/weopc-release
+            if [ -d /home/weopc/weopc-release/weopc ]; then
+              RELEASE_DIR=/home/weopc/weopc-release/weopc
+            fi
+            chmod +x "$RELEASE_DIR/deploy/deploy.sh"
+            "$RELEASE_DIR/deploy/deploy.sh"
