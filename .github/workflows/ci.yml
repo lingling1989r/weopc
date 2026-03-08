@@ -55,10 +55,6 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
-    env:
-      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST != '' && secrets.DEPLOY_HOST || vars.DEPLOY_HOST }}
-      DEPLOY_USER: ${{ secrets.DEPLOY_USER != '' && secrets.DEPLOY_USER || vars.DEPLOY_USER }}
-      DEPLOY_PORT: ${{ secrets.DEPLOY_PORT != '' && secrets.DEPLOY_PORT || vars.DEPLOY_PORT }}
 
     steps:
       - name: Checkout code
@@ -67,36 +63,33 @@ jobs:
       - name: Create deployment archive
         run: git archive --format=tar.gz --output=weopc-deploy.tar.gz HEAD
 
-      - name: Validate deploy configuration
+      - name: Validate SSH key
         run: |
-          test -n "$DEPLOY_HOST" || (echo "DEPLOY_HOST is missing" && exit 1)
-          test -n "$DEPLOY_USER" || (echo "DEPLOY_USER is missing" && exit 1)
-          test -n "$DEPLOY_PORT" || (echo "DEPLOY_PORT is missing" && exit 1)
           test -n "${{ secrets.DEPLOY_SSH_KEY }}" || (echo "DEPLOY_SSH_KEY is missing" && exit 1)
 
       - name: Write SSH key file
         run: |
-          mkdir -p ~/.ssh
-          printf '%s' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
+          mkdir -p $GITHUB_WORKSPACE/.ssh
+          printf '%s' "${{ secrets.DEPLOY_SSH_KEY }}" > $GITHUB_WORKSPACE/.ssh/deploy_key
+          chmod 600 $GITHUB_WORKSPACE/.ssh/deploy_key
 
       - name: Upload archive to server
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ env.DEPLOY_HOST }}
-          username: ${{ env.DEPLOY_USER }}
-          key_path: ~/.ssh/deploy_key
-          port: ${{ env.DEPLOY_PORT }}
+          host: 47.107.250.96
+          username: weopc
+          key_path: ${{ github.workspace }}/.ssh/deploy_key
+          port: 22
           source: weopc-deploy.tar.gz
           target: /home/weopc
 
       - name: Deploy on production server
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ env.DEPLOY_HOST }}
-          username: ${{ env.DEPLOY_USER }}
-          key_path: ~/.ssh/deploy_key
-          port: ${{ env.DEPLOY_PORT }}
+          host: 47.107.250.96
+          username: weopc
+          key_path: ${{ github.workspace }}/.ssh/deploy_key
+          port: 22
           script: |
             set -e
             rm -rf /home/weopc/weopc-release
