@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useAuthStore } from '@/lib/store/auth';
 
 interface Link {
   id: string;
@@ -18,7 +18,8 @@ interface Link {
 }
 
 export default function ToolboxPage() {
-  const { user, isAuthenticated } = useAuth();
+  const user = useAuthStore(state => state.user);
+  const isAuthenticated = useAuthStore(state => !!state.token);
   const [links, setLinks] = useState<Link[]>([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
