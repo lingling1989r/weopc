@@ -340,6 +340,78 @@ P0
 
 后台管理员可手动更新客资对接状态（未对接、已对接、对接成功、对接失败），形成对接台账，为后期运营复盘、点评引导做铺垫；状态更新接口后端统一设计，更新
 
+---
+
+## 开发规范 / 常见 CI 问题记录
+
+> 每次 push 前务必本地跑完整 build：`pnpm -r --filter=@weopc/api --filter=@weopc/web build`
+
+### 1. Prisma schema — 新增 model 必须补双向关联
+
+**问题**：新增含 `userId` 字段的 model（如 `Link`），只在 `User` 上加了 `links Link[]`，但 `Link` model 里缺少反向关联字段，导致 `prisma generate` 报 P1012 错误。
+
+**规范**：每个 model 的外键字段都必须配一个对应的 `@relation` 字段。
+
+```prisma
+// ✅ 正确
+model Link {
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+```
+
+验证命令：`pnpm --filter @weopc/api exec prisma validate`
+
+---
+
+### 2. Express Router — 必须显式声明类型
+
+**问题**：`const router = Router()` 推断类型引用了 pnpm 内部路径，TypeScript 编译报 TS2742 不可导出错误。
+
+**规范**：所有路由文件统一加显式类型注解。
+
+```typescript
+// ✅ 正确
+import { Router } from 'express';
+const router: Router = Router();
+```
+
+---
+
+### 3. Web 应用 — 禁止直接连接数据库
+
+**问题**：`apps/web` 是 Next.js 前端应用，没有配置数据库连接。在页面文件中 `import { prisma } from '@/lib/database/prisma'` 会导致 build 失败（模块不存在）。
+
+**规范**：Web 应用的所有数据读写必须通过 API（`NEXT_PUBLIC_API_URL`）进行，不得直接使用 Prisma。
+
+```typescript
+// ❌ 错误 — web 页面里直接查 DB
+import { prisma } from '@/lib/database/prisma';
+const link = await prisma.link.findUnique(...);
+
+// ✅ 正确 — 通过 API 获取，或 client component 跳转到 API 端点
+window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/links/t/${shortCode}`;
+```
+
+---
+
+### 4. Web 应用 — 认证状态使用 useAuthStore
+
+**问题**：`@/lib/hooks/useAuth` 不存在，使用该路径导入会导致 build 失败。
+
+**规范**：认证状态统一从 Zustand store 获取。
+
+```typescript
+// ❌ 错误
+import { useAuth } from '@/lib/hooks/useAuth';
+const { user, isAuthenticated } = useAuth();
+
+// ✅ 正确
+import { useAuthStore } from '@/lib/store/auth';
+const user = useAuthStore(state => state.user);
+const isAuthenticated = useAuthStore(state => !!state.token);
+```
+
 
 
 
