@@ -174,7 +174,7 @@ async function fetchGovSearchPage(params: {
   });
 }
 
-async function ingestItem(item: GovSearchItem, searchWord: string) {
+async function ingestItem(item: GovSearchItem, _searchWord: string) {
   const sourceUrl = item.url?.trim();
   if (!sourceUrl) return;
 

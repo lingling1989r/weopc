@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 const prisma = new PrismaClient();
 
 // 获取政策资讯列表
@@ -23,7 +23,7 @@ router.get('/policy', async (req, res) => {
       prisma.policyNews.count({ where }),
     ]);
     
-    res.json({
+    return res.json({
       success: true,
       data: items,
       pagination: {
@@ -34,7 +34,7 @@ router.get('/policy', async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ success: false, error: '获取政策资讯失败' });
+    return res.status(500).json({ success: false, error: '获取政策资讯失败' });
   }
 });
 
@@ -50,9 +50,9 @@ router.get('/policy/:id', async (req, res) => {
       return res.status(404).json({ success: false, error: '政策资讯不存在' });
     }
     
-    res.json({ success: true, data: item });
+    return res.json({ success: true, data: item });
   } catch (error) {
-    res.status(500).json({ success: false, error: '获取政策资讯详情失败' });
+    return res.status(500).json({ success: false, error: '获取政策资讯详情失败' });
   }
 });
 
@@ -76,7 +76,7 @@ router.get('/event', async (req, res) => {
       prisma.event.count({ where }),
     ]);
     
-    res.json({
+    return res.json({
       success: true,
       data: items,
       pagination: {
@@ -87,7 +87,7 @@ router.get('/event', async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ success: false, error: '获取活动赛事失败' });
+    return res.status(500).json({ success: false, error: '获取活动赛事失败' });
   }
 });
 
@@ -103,9 +103,9 @@ router.get('/event/:id', async (req, res) => {
       return res.status(404).json({ success: false, error: '活动赛事不存在' });
     }
     
-    res.json({ success: true, data: item });
+    return res.json({ success: true, data: item });
   } catch (error) {
-    res.status(500).json({ success: false, error: '获取活动赛事详情失败' });
+    return res.status(500).json({ success: false, error: '获取活动赛事详情失败' });
   }
 });
 
