@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../../database/prisma/client';
 import { authenticate, AuthRequest } from '../../shared/middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 
 // 创建追踪链接
 router.post('/', authenticate, async (req: AuthRequest, res) => {
