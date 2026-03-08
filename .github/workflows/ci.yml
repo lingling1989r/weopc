@@ -63,12 +63,18 @@ jobs:
       - name: Create deployment archive
         run: git archive --format=tar.gz --output=weopc-deploy.tar.gz HEAD
 
+      - name: Write SSH key file
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
       - name: Upload archive to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          key_path: ~/.ssh/deploy_key
           port: ${{ secrets.DEPLOY_PORT }}
           source: weopc-deploy.tar.gz
           target: /home/weopc
@@ -78,7 +84,7 @@ jobs:
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          key_path: ~/.ssh/deploy_key
           port: ${{ secrets.DEPLOY_PORT }}
           script: |
             set -e
