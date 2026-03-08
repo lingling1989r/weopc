@@ -279,30 +279,6 @@ model Review {
   @@index([published])
 }
 
-model Link {
-  id            String    @id @default(uuid())
-  originalUrl   String
-  shortCode     String    @unique
-  customAlias   String?   @unique
-
-  userId        String?
-  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  clickCount    Int       @default(0)
-  lastClickedAt DateTime?
-  expiresAt     DateTime?
-  password      String?
-  maxClicks     Int?
-  title         String?
-  description   String?
-
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  @@index([shortCode])
-  @@index([userId])
-}
-
 model BlogPost {
   id              String          @id @default(uuid())
   title           String
