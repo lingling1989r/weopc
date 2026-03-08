@@ -1,0 +1,36 @@
+name: Crawler Schedule
+
+on:
+  schedule:
+    # 每天凌晨 3:00 UTC (北京时间 11:00)
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    # 手动触发
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./apps/api
+      
+      - name: Run crawler
+        run: pnpm run crawler
+        working-directory: ./apps/api
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Check crawl results
+        if: always()
+        run: |
+          echo "Crawler completed"
