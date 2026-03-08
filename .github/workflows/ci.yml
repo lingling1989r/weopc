@@ -31,15 +31,21 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
+        env:
+          DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/weopc?schema=public
         run: pnpm --filter @weopc/api exec prisma generate
 
       - name: TypeScript type check (api)
+        env:
+          DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/weopc?schema=public
         run: pnpm --filter @weopc/api exec tsc --noEmit
 
       - name: TypeScript type check (web)
         run: pnpm --filter @weopc/web exec next lint
 
       - name: Prisma validate
+        env:
+          DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/weopc?schema=public
         run: pnpm --filter @weopc/api exec prisma validate
 
       - name: Build
