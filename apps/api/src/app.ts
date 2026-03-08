@@ -16,6 +16,7 @@ import reviewRoutes from './modules/reviews/routes';
 import preferenceRoutes from './modules/preferences/routes';
 import recommendationRoutes from './modules/recommendations/routes';
 import informationRoutes from './modules/information/routes';
+import linkRoutes from './modules/links/routes';
 
 const app: Express = express();
 
@@ -42,6 +43,7 @@ app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/preferences', preferenceRoutes);
 app.use('/api/v1/recommendations', recommendationRoutes);
 app.use('/api/v1/information', informationRoutes);
+app.use('/api/v1/links', linkRoutes);
 
 // 404 handler
 app.use((_req, res) => {

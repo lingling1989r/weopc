@@ -470,3 +470,37 @@ model CrawlerTask {
   startedAt   DateTime  @default(now())
   finishedAt  DateTime?
 }
+
+// 链接追踪
+model Link {
+  id            String   @id @default(uuid())
+  userId        String   // 所属用户
+  originalUrl   String   // 原始链接
+  shortCode     String   @unique // 短码
+  name          String?  // 链接名称/备注
+  source        String?  // 来源：wechat/xiaohongshu/douyin等
+  clicks        Int      @default(0) // 点击次数
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  clickLogs     LinkClick[]
+  
+  @@index([userId])
+  @@index([shortCode])
+}
+
+// 点击日志
+model LinkClick {
+  id          String   @id @default(uuid())
+  linkId      String
+  link        Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  referer     String?  // 来源页面
+  userAgent   String?  // 浏览器信息
+  ip          String?  // IP地址
+  country     String?  // 国家
+  city        String?  // 城市
+  clickedAt   DateTime @default(now())
+  
+  @@index([linkId])
+  @@index([clickedAt])
+}
