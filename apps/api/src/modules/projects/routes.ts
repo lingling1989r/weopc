@@ -11,7 +11,7 @@ const createProjectSchema = z.object({
   title: z.string().min(5).max(200),
   description: z.string().min(20),
   shortDescription: z.string().max(500).optional(),
-  type: z.enum(['FULL_TIME', 'PART_TIME', 'FREELANCE', 'SIDE_GIG', 'INTERNSHIP']),
+  type: z.literal('TOOLBOX').default('TOOLBOX'),
   category: z.string(),
   tags: z.array(z.string()).default([]),
   revenueTier: z.enum(['TIER_0_1K', 'TIER_1K_5K', 'TIER_5K_10K', 'TIER_10K_30K', 'TIER_30K_50K', 'TIER_50K_100K', 'TIER_100K_PLUS']),
@@ -28,7 +28,7 @@ const createProjectSchema = z.object({
 });
 
 // Valid enum values
-const VALID_PROJECT_TYPES = ['FULL_TIME', 'PART_TIME', 'FREELANCE', 'SIDE_GIG', 'INTERNSHIP'];
+const VALID_PROJECT_TYPES = ['TOOLBOX'];
 const VALID_REVENUE_TIERS = ['TIER_0_1K', 'TIER_1K_5K', 'TIER_5K_10K', 'TIER_10K_30K', 'TIER_30K_50K', 'TIER_50K_100K', 'TIER_100K_PLUS'];
 const VALID_EXECUTION_REQS = ['REMOTE', 'ONSITE', 'HYBRID', 'FLEXIBLE'];
 

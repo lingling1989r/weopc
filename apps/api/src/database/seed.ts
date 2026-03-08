@@ -37,17 +37,7 @@ async function main() {
   const projectsPath = path.join(__dirname, '../data/featured-projects.json');
   const projectsData = JSON.parse(fs.readFileSync(projectsPath, 'utf-8'));
 
-  // 3. Map categories to ProjectType and RevenueTier
-  const categoryToType: { [key: string]: ProjectType } = {
-    '小红书': 'SIDE_GIG',
-    '闲鱼': 'SIDE_GIG',
-    '蓝海项目': 'SIDE_GIG',
-    '短视频': 'SIDE_GIG',
-    'AI视频': 'SIDE_GIG',
-    'YouTube': 'SIDE_GIG',
-    '接单': 'FREELANCE',
-    '餐饮': 'PART_TIME',
-  };
+  // 3. Map categories to RevenueTier
 
   const revenueMap: { [key: string]: RevenueTier } = {
     '1000+': 'TIER_1K_5K',
@@ -76,7 +66,7 @@ async function main() {
           title: proj.title,
           description: proj.description,
           shortDescription: proj.description.substring(0, 100),
-          type: categoryToType[proj.category] || 'SIDE_GIG',
+          type: ProjectType.TOOLBOX,
           category: proj.category,
           tags: proj.tags || [],
           revenueTier: revenueTier,

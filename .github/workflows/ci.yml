@@ -28,17 +28,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate Prisma client
+        run: pnpm --filter @weopc/api exec prisma generate
+
       - name: TypeScript type check (api)
-        working-directory: ./apps/api
-        run: npx tsc --noEmit
+        run: pnpm --filter @weopc/api exec tsc --noEmit
 
       - name: TypeScript type check (web)
-        working-directory: ./apps/web
-        run: npx next lint
+        run: pnpm --filter @weopc/web exec next lint
 
       - name: Prisma validate
-        working-directory: ./apps/api
-        run: npx prisma validate
+        run: pnpm --filter @weopc/api exec prisma validate
 
       - name: Build
         run: pnpm -r --filter=@weopc/api --filter=@weopc/web build
