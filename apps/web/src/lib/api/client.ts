@@ -96,6 +96,7 @@ export const showcaseApi = {
 export const adminApi = {
   getPendingProjects: () => authenticatedApiClient.get('/admin/projects/pending'),
   getAllProjects: (params?: any) => authenticatedApiClient.get('/admin/projects', { params }),
+  getProjectById: (id: string) => authenticatedApiClient.get(`/admin/projects/${id}`),
   approveProject: (id: string) => authenticatedApiClient.post(`/admin/projects/${id}/approve`),
   rejectProject: (id: string, reason: string) =>
     authenticatedApiClient.post(`/admin/projects/${id}/reject`, { reason }),
@@ -104,6 +105,9 @@ export const adminApi = {
   getUserById: (id: string) => authenticatedApiClient.get(`/admin/users/${id}`),
   certifyUser: (id: string, certified: boolean) =>
     authenticatedApiClient.patch(`/admin/users/${id}/certify`, { certified }),
+  getInvitationCodes: (params?: any) => authenticatedApiClient.get('/admin/invitation-codes', { params }),
+  generateInvitationCodes: (count: number) => authenticatedApiClient.post('/admin/invitation-codes', { count }),
+  disableInvitationCode: (id: string) => authenticatedApiClient.patch(`/admin/invitation-codes/${id}/disable`),
 };
 
 // Users API
