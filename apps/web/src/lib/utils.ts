@@ -21,6 +21,7 @@ export const PROJECT_TYPE_LABELS: Record<string, string> = {
   FREELANCE: '自由职业',
   SIDE_GIG: '副业',
   INTERNSHIP: '实习',
+  TOOLBOX: '工具箱',
 };
 
 export const EXECUTION_REQ_LABELS: Record<string, string> = {

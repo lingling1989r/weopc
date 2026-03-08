@@ -36,6 +36,7 @@ enum ProjectType {
   FREELANCE
   SIDE_GIG
   INTERNSHIP
+  TOOLBOX
 }
 
 enum RevenueTier {
