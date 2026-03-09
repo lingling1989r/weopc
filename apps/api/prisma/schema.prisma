@@ -31,6 +31,11 @@ enum UserStatus {
 }
 
 enum ProjectType {
+  FULL_TIME
+  PART_TIME
+  FREELANCE
+  SIDE_GIG
+  INTERNSHIP
   TOOLBOX
 }
 

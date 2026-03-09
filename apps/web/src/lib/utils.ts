@@ -16,6 +16,11 @@ export const REVENUE_TIER_LABELS: Record<string, string> = {
 };
 
 export const PROJECT_TYPE_LABELS: Record<string, string> = {
+  FULL_TIME: '全职',
+  PART_TIME: '兼职',
+  FREELANCE: '自由职业',
+  SIDE_GIG: '副业',
+  INTERNSHIP: '实习',
   TOOLBOX: '工具箱',
 };
 

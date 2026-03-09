@@ -13,6 +13,7 @@ const PROJECT_TYPES = [
   { value: 'FREELANCE', label: '自由职业' },
   { value: 'SIDE_GIG', label: '副业' },
   { value: 'INTERNSHIP', label: '实习' },
+  { value: 'TOOLBOX', label: '工具箱' },
 ];
 
 const REVENUE_TIERS = [
