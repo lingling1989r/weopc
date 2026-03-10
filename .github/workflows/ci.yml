@@ -54,7 +54,11 @@ jobs:
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, weopc-deploy]
+    env:
+      DEPLOY_HOST: 47.107.250.96
+      DEPLOY_PORT: '22'
+      DEPLOY_USER: weopc
 
     steps:
       - name: Checkout code
@@ -67,41 +71,24 @@ jobs:
         run: |
           test -n "${{ secrets.DEPLOY_SSH_KEY }}" || (echo "DEPLOY_SSH_KEY is missing" && exit 1)
 
-      - name: Debug connectivity
+      - name: Setup SSH
+        shell: bash
         run: |
-          echo "Runner IP:"
-          curl -s ifconfig.me
-          echo ""
-          echo "Testing TCP connection to port 22:"
-          timeout 10 bash -c 'cat < /dev/null > /dev/tcp/47.107.250.96/22' && echo "Port 22 OPEN" || echo "Port 22 BLOCKED"
-          echo "Testing ping:"
-          ping -c 3 47.107.250.96 || true
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p "${DEPLOY_PORT}" -H "${DEPLOY_HOST}" >> ~/.ssh/known_hosts
 
       - name: Upload archive to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: 47.107.250.96
-          username: weopc
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          port: 22
-          source: weopc-deploy.tar.gz
-          target: /home/weopc
+        shell: bash
+        run: |
+          set -euo pipefail
+          scp -P "${DEPLOY_PORT}" -i ~/.ssh/id_rsa weopc-deploy.tar.gz "${DEPLOY_USER}@${DEPLOY_HOST}:/home/${DEPLOY_USER}/weopc-deploy.tar.gz"
 
       - name: Deploy on production server
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: 47.107.250.96
-          username: weopc
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          port: 22
-          script: |
-            set -e
-            rm -rf /home/weopc/weopc-release
-            mkdir -p /home/weopc/weopc /home/weopc/weopc-release
-            tar -xzf /home/weopc/weopc-deploy.tar.gz -C /home/weopc/weopc-release
-            RELEASE_DIR=/home/weopc/weopc-release
-            if [ -d /home/weopc/weopc-release/weopc ]; then
-              RELEASE_DIR=/home/weopc/weopc-release/weopc
-            fi
-            chmod +x "$RELEASE_DIR/deploy/deploy.sh"
-            "$RELEASE_DIR/deploy/deploy.sh"
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -p "${DEPLOY_PORT}" -i ~/.ssh/id_rsa "${DEPLOY_USER}@${DEPLOY_HOST}" "bash /home/${DEPLOY_USER}/deploy/deploy.sh"
