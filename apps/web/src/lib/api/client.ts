@@ -48,7 +48,7 @@ authenticatedApiClient.interceptors.response.use(
 
 // Auth API
 export const authApi = {
-  register: (data: { email: string; password: string; username: string; role: 'USER' | 'PROVIDER'; invitationCode?: string }) =>
+  register: (data: { email: string; password: string; username: string; role: 'USER' | 'PROVIDER'; invitationCode?: string; inviteCode?: string }) =>
     publicApiClient.post('/auth/register', data),
   login: (data: { email: string; password: string }) =>
     publicApiClient.post('/auth/login', data),
@@ -114,4 +114,25 @@ export const adminApi = {
 export const usersApi = {
   getMyPoints: () => authenticatedApiClient.get('/users/me/points'),
   getUserPoints: (id: string) => publicApiClient.get(`/users/${id}/points`),
+};
+
+// Skills API
+export const skillsApi = {
+  list: (params?: any) => publicApiClient.get('/skills', { params }),
+  getById: (id: string) => publicApiClient.get(`/skills/${id}`),
+  create: (data: any) => authenticatedApiClient.post('/skills', data),
+  update: (id: string, data: any) => authenticatedApiClient.put(`/skills/${id}`, data),
+  submit: (id: string) => authenticatedApiClient.post(`/skills/${id}/submit`),
+  redeem: (id: string) => authenticatedApiClient.post(`/skills/${id}/redeem`),
+  getMyList: () => authenticatedApiClient.get('/skills/my/list'),
+  getMyPurchased: () => authenticatedApiClient.get('/skills/my/purchased'),
+};
+
+// Admin Skills API
+export const adminSkillsApi = {
+  getPending: () => authenticatedApiClient.get('/admin/skills/pending'),
+  getAll: (params?: any) => authenticatedApiClient.get('/admin/skills', { params }),
+  getById: (id: string) => authenticatedApiClient.get(`/admin/skills/${id}`),
+  approve: (id: string) => authenticatedApiClient.post(`/admin/skills/${id}/approve`),
+  reject: (id: string, reason: string) => authenticatedApiClient.post(`/admin/skills/${id}/reject`, { reason }),
 };

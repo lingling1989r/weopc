@@ -100,6 +100,21 @@ enum PointsActionType {
   PROJECT_COMPLETED
   REVIEW_RECEIVED
   ADMIN_REWARD
+  // V1 Points System
+  SIGNUP_BONUS
+  INVITE_INVITER
+  INVITE_INVITEE
+  SKILL_SUBMIT
+  SKILL_APPROVED
+  SKILL_REDEEM
+  ADMIN_DEDUCT
+}
+
+enum SkillReviewStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 model UserPreference {
@@ -155,6 +170,11 @@ model User {
   invitationCodeId String?   @unique
   invitationCode   InvitationCode? @relation(fields: [invitationCodeId], references: [id], onDelete: SetNull)
 
+  // Who invited this user (for invite points)
+  inviterUserId   String?
+  inviterUser     User?     @relation("UserInviterRelation", fields: [inviterUserId], references: [id], onDelete: SetNull)
+  invitedUsers    User[]    @relation("UserInviterRelation")
+
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
@@ -169,6 +189,10 @@ model User {
   pointsHistory UserPoints[]
   generatedInvitations InvitationCode[] @relation("GeneratedBy")
   preference    UserPreference?
+  
+  // V1: Skills
+  skills        Skill[]
+  skillRedemptions SkillRedemption[]
 
   @@index([email])
   @@index([username])
@@ -345,6 +369,7 @@ model InvitationCode {
   generatedBy     User                    @relation("GeneratedBy", fields: [generatedById], references: [id], onDelete: Cascade)
 
   usedBy          User?
+  inviteeUserId   String?   // Track who used this code
 
   expiresAt       DateTime?
   usedAt          DateTime?
@@ -357,6 +382,49 @@ model InvitationCode {
   @@index([generatedById])
 }
 
+// ============ V1: Skill Marketplace ============
+
+model Skill {
+  id              String              @id @default(uuid())
+  title           String
+  description     String
+  content         String?   // Detailed instructions/readme
+  category        String?
+  tags            String[]  @default([])
+  pricePoints     Int        @default(0) // 0 = free
+  reviewStatus    SkillReviewStatus @default(DRAFT)
+  reviewNote      String?   // Rejection reason or review comment
+  reviewerContact String?   // WeChat contact for review communication
+  
+  ownerUserId     String
+  owner           User      @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  
+  downloadCount   Int        @default(0)
+  redemptions    SkillRedemption[]
+  
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@index([ownerUserId])
+  @@index([reviewStatus])
+  @@index([category])
+}
+
+model SkillRedemption {
+  id              String              @id @default(uuid())
+  userId          String
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skillId         String
+  skill           Skill               @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  costPoints      Int
+  
+  createdAt       DateTime            @default(now())
+
+  @@unique([userId, skillId]) // One-time purchase
+  @@index([userId])
+  @@index([skillId])
+}
+
 model UserPoints {
   id              String              @id @default(uuid())
   userId          String
@@ -365,7 +433,7 @@ model UserPoints {
   actionType      PointsActionType
   points          Int
   description     String?
-
+  refType        String?   // Type of related resource for idempotency (e.g., 'skill_submit', 'invite_inviter')
   relatedId       String?  // ID of related resource (comment, blog, etc)
 
   createdAt       DateTime            @default(now())

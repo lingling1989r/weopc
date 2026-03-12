@@ -184,6 +184,12 @@ export default function AdminDashboard() {
           >
             用户与邀请码管理
           </Link>
+          <Link
+            href="/dashboard/admin/skills/pending"
+            className="px-5 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium"
+          >
+            Skill 审核
+          </Link>
         </div>
 
         {stats && (

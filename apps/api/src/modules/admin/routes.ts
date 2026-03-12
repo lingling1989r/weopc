@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { prisma } from '../../database/prisma/client';
 import { authenticate, requireRole, AuthRequest } from '../../shared/middleware/auth';
 import { ValidationError, NotFoundError } from '../../shared/utils/errors';
+import { awardPoints } from '../points/service';
 
 const router: ReturnType<typeof Router> = Router();
 const ADMIN_INVITATION_CODE_LENGTH = 8;
@@ -675,6 +676,252 @@ router.patch(
       });
     } catch (error) {
       next(error);
+    }
+  }
+);
+
+// ============ Skill Review ============
+
+// Validation schemas for skill review
+const skillReviewSchema = z.object({
+  reason: z.string().min(5).max(500).optional(),
+});
+
+// Get pending skills (ADMIN only)
+router.get(
+  '/skills/pending',
+  authenticate,
+  requireRole(['ADMIN']),
+  async (_req: AuthRequest, res, next) => {
+    try {
+      const skills = await prisma.skill.findMany({
+        where: { reviewStatus: 'PENDING' },
+        orderBy: { updatedAt: 'asc' },
+        include: {
+          owner: {
+            select: {
+              id: true,
+              username: true,
+              displayName: true,
+              email: true,
+              avatar: true,
+            },
+          },
+        },
+      });
+
+      res.json({
+        success: true,
+        data: skills,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// Get all skills with status filter (ADMIN only)
+router.get(
+  '/skills',
+  authenticate,
+  requireRole(['ADMIN']),
+  async (req: AuthRequest, res, next) => {
+    try {
+      const status = req.query.status as string | undefined;
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      const skip = (page - 1) * limit;
+
+      const where: any = {};
+      if (status) where.reviewStatus = status;
+
+      const [skills, total] = await Promise.all([
+        prisma.skill.findMany({
+          where,
+          skip,
+          take: limit,
+          orderBy: { updatedAt: 'desc' },
+          include: {
+            owner: {
+              select: {
+                id: true,
+                username: true,
+                displayName: true,
+                email: true,
+                avatar: true,
+              },
+            },
+          },
+        }),
+        prisma.skill.count({ where }),
+      ]);
+
+      res.json({
+        success: true,
+        data: skills,
+        meta: {
+          pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+          },
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// Get skill detail (ADMIN only)
+router.get(
+  '/skills/:id',
+  authenticate,
+  requireRole(['ADMIN']),
+  async (req: AuthRequest, res, next) => {
+    try {
+      const skill = await prisma.skill.findUnique({
+        where: { id: req.params.id },
+        include: {
+          owner: {
+            select: {
+              id: true,
+              username: true,
+              displayName: true,
+              email: true,
+              avatar: true,
+              role: true,
+              status: true,
+              createdAt: true,
+            },
+          },
+        },
+      });
+
+      if (!skill) {
+        throw new NotFoundError('Skill not found');
+      }
+
+      res.json({
+        success: true,
+        data: skill,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// Approve skill (ADMIN only)
+router.post(
+  '/skills/:id/approve',
+  authenticate,
+  requireRole(['ADMIN']),
+  async (req: AuthRequest, res, next) => {
+    try {
+      const skill = await prisma.skill.findUnique({
+        where: { id: req.params.id },
+      });
+
+      if (!skill) {
+        throw new NotFoundError('Skill not found');
+      }
+
+      if (skill.reviewStatus !== 'PENDING') {
+        throw new ValidationError('Only pending skills can be approved', []);
+      }
+
+      const updatedSkill = await prisma.skill.update({
+        where: { id: req.params.id },
+        data: {
+          reviewStatus: 'APPROVED',
+          reviewNote: null, // Clear any previous rejection note
+        },
+        include: {
+          owner: {
+            select: {
+              id: true,
+              username: true,
+              displayName: true,
+              email: true,
+              avatar: true,
+            },
+          },
+        },
+      });
+
+      // Award points to skill owner (+40 for approved skill)
+      await awardPoints(
+        skill.ownerUserId,
+        'SKILL_APPROVED',
+        `Your skill "${skill.title}" has been approved`,
+        skill.id,
+        'skill_approved'
+      );
+
+      res.json({
+        success: true,
+        data: updatedSkill,
+        message: 'Skill approved! Owner has been awarded 40 points.',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// Reject skill (ADMIN only)
+router.post(
+  '/skills/:id/reject',
+  authenticate,
+  requireRole(['ADMIN']),
+  async (req: AuthRequest, res, next) => {
+    try {
+      const data = skillReviewSchema.parse(req.body);
+
+      const skill = await prisma.skill.findUnique({
+        where: { id: req.params.id },
+      });
+
+      if (!skill) {
+        throw new NotFoundError('Skill not found');
+      }
+
+      if (skill.reviewStatus !== 'PENDING') {
+        throw new ValidationError('Only pending skills can be rejected', []);
+      }
+
+      const updatedSkill = await prisma.skill.update({
+        where: { id: req.params.id },
+        data: {
+          reviewStatus: 'REJECTED',
+          reviewNote: data.reason || 'Does not meet our guidelines',
+        },
+        include: {
+          owner: {
+            select: {
+              id: true,
+              username: true,
+              displayName: true,
+              email: true,
+              avatar: true,
+            },
+          },
+        },
+      });
+
+      res.json({
+        success: true,
+        data: updatedSkill,
+        message: 'Skill rejected. Owner has been notified.',
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        next(new ValidationError('Invalid input', error.errors));
+      } else {
+        next(error);
+      }
     }
   }
 );

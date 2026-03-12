@@ -17,6 +17,7 @@ function RegisterPageContent() {
     username: '',
     role: defaultRole,
     invitationCode: '',
+    inviteCode: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -174,10 +175,25 @@ function RegisterPageContent() {
               />
             </div>
 
+            {/* Optional invite code for invite points (for all roles) */}
+            <div>
+              <label htmlFor="inviteCode" className="block text-sm font-medium text-gray-700 mb-2">
+                邀请码（选填，获得积分奖励）
+              </label>
+              <input
+                id="inviteCode"
+                type="text"
+                value={formData.inviteCode}
+                onChange={(e) => setFormData({ ...formData, inviteCode: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                placeholder="如果你有邀请码，输入可获得积分"
+              />
+            </div>
+
             {formData.role === 'PROVIDER' && (
               <div>
                 <label htmlFor="invitationCode" className="block text-sm font-medium text-gray-700 mb-2">
-                  邀请码 <span className="text-red-500">*</span>
+                  Provider 邀请码 <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="invitationCode"
@@ -192,7 +208,7 @@ function RegisterPageContent() {
                       ? 'border-red-300 focus:ring-red-500'
                       : 'border-gray-300 focus:ring-primary'
                   }`}
-                  placeholder="请输入邀请码"
+                  placeholder="请输入 Provider 注册邀请码"
                 />
                 {invitationCodeValid === true && (
                   <p className="mt-2 text-sm text-green-600">✓ 邀请码有效</p>

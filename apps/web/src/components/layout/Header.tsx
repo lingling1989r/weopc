@@ -35,6 +35,9 @@ export function Header() {
             <Link href="/projects" className="text-gray-700 hover:text-blue-600 font-medium">
               项目广场
             </Link>
+            <Link href="/skills" className="text-gray-700 hover:text-blue-600 font-medium">
+              Skill 市场
+            </Link>
 
             {isHydrated && isAuthenticated() ? (
               <div className="relative">

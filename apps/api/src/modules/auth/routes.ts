@@ -6,6 +6,7 @@ import { prisma } from '../../database/prisma/client';
 import { config } from '../../config';
 import { ValidationError, UnauthorizedError, ConflictError } from '../../shared/utils/errors';
 import { authenticate, AuthRequest } from '../../shared/middleware/auth';
+import { awardPoints, checkInviterDailyCap } from '../points/service';
 
 const router: ReturnType<typeof Router> = Router();
 
@@ -16,7 +17,8 @@ const registerSchema = z.object({
   username: z.string().min(3).max(30),
   displayName: z.string().optional(),
   role: z.enum(['USER', 'PROVIDER']).default('USER'),
-  invitationCode: z.string().optional(),
+  invitationCode: z.string().optional(), // For PROVIDER role (required)
+  inviteCode: z.string().optional(), // For invite points (optional, any user can share)
 });
 
 const loginSchema = z.object({
@@ -98,6 +100,13 @@ router.post('/register', async (req, res, next) => {
       throw new ConflictError('Email or username already exists');
     }
 
+    const providerInvitationCode = data.role === 'PROVIDER' && data.invitationCode
+      ? await prisma.invitationCode.findUnique({
+          where: { code: data.invitationCode },
+          select: { id: true },
+        })
+      : null;
+
     // Hash password
     const passwordHash = await bcrypt.hash(data.password, 10);
 
@@ -111,10 +120,7 @@ router.post('/register', async (req, res, next) => {
         role: data.role,
         status: 'ACTIVE', // For MVP, auto-activate
         emailVerified: true, // For MVP, skip email verification
-        invitationCodeId: data.role === 'PROVIDER' ? (await prisma.invitationCode.findUnique({
-          where: { code: data.invitationCode! },
-          select: { id: true },
-        }))?.id : undefined,
+        invitationCodeId: providerInvitationCode?.id,
       },
       select: {
         id: true,
@@ -134,8 +140,84 @@ router.post('/register', async (req, res, next) => {
         data: {
           status: 'USED',
           usedAt: new Date(),
+          inviteeUserId: user.id,
         },
       });
+    }
+
+    // V1: Award signup bonus (+20) and handle invite points
+    const pointsAwarded: { signup: number; invite: number } = { signup: 0, invite: 0 };
+    
+    // Award signup bonus to new user
+    const signupResult = await awardPoints(
+      user.id,
+      'SIGNUP_BONUS',
+      'Welcome! Thanks for joining us',
+      user.id,
+      'signup_bonus'
+    );
+    if (signupResult.success) {
+      pointsAwarded.signup = signupResult.pointsAwarded;
+    }
+
+    // Handle invite code (different from PROVIDER invitation code)
+    if (data.inviteCode) {
+      const inviteCodeRecord = await prisma.invitationCode.findFirst({
+        where: {
+          code: data.inviteCode,
+          status: 'ACTIVE',
+          generatedById: { not: user.id },
+        },
+      });
+
+      if (inviteCodeRecord) {
+        // Check inviter hasn't hit daily cap
+        const isAtCap = await checkInviterDailyCap(inviteCodeRecord.generatedById);
+
+        // Link the new user to the inviter and record the invitee on the code.
+        // Do not mark the code as USED here; invite codes for points stay ACTIVE unless
+        // the same code is also used as a provider registration invitation code.
+        await prisma.$transaction([
+          prisma.invitationCode.update({
+            where: { id: inviteCodeRecord.id },
+            data: {
+              inviteeUserId: user.id,
+            },
+          }),
+          prisma.user.update({
+            where: { id: user.id },
+            data: {
+              inviterUserId: inviteCodeRecord.generatedById,
+            },
+          }),
+        ]);
+
+        // Award invitee bonus (+10) if inviter hasn't hit daily cap
+        if (!isAtCap) {
+          const inviteeResult = await awardPoints(
+            user.id,
+            'INVITE_INVITEE',
+            'Thanks for joining via an invitation',
+            inviteCodeRecord.id,
+            'invite_invitee'
+          );
+          if (inviteeResult.success) {
+            pointsAwarded.invite = inviteeResult.pointsAwarded;
+          }
+
+          // Award inviter bonus (+30)
+          const inviterResult = await awardPoints(
+            inviteCodeRecord.generatedById,
+            'INVITE_INVITER',
+            `${user.username || 'Someone'} joined using your invite`,
+            inviteCodeRecord.id,
+            'invite_inviter'
+          );
+          if (inviterResult.success) {
+            pointsAwarded.invite += inviterResult.pointsAwarded;
+          }
+        }
+      }
     }
 
     // Generate token
@@ -150,6 +232,7 @@ router.post('/register', async (req, res, next) => {
       data: {
         user,
         token,
+        pointsAwarded,
       },
     });
   } catch (error) {
