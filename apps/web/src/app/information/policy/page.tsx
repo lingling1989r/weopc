@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { publicApiClient } from '@/lib/api/client';
@@ -22,10 +22,10 @@ export default function PolicyPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // 实际加载数据时使用
-  // useEffect(() => {
-  //   loadPolicies();
-  // }, [page]);
+  useEffect(() => {
+    loadPolicies();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
 
   const loadPolicies = async () => {
     setLoading(true);
@@ -76,7 +76,7 @@ export default function PolicyPage() {
     },
   ];
 
-  const displayPolicies = policies.length > 0 ? policies : samplePolicies;
+  const displayPolicies = policies;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -93,6 +93,10 @@ export default function PolicyPage() {
                 <div className="h-4 bg-gray-200 rounded w-1/2"></div>
               </div>
             ))}
+          </div>
+        ) : displayPolicies.length === 0 ? (
+          <div className="bg-white rounded-lg p-8 text-center text-gray-500">
+            暂无政策资讯
           </div>
         ) : (
           <>
@@ -112,7 +116,7 @@ export default function PolicyPage() {
                     <span className="text-xs text-gray-500">{policy.source}</span>
                     {policy.publishDate && (
                       <span className="text-xs text-gray-400">
-                        {policy.publishDate}
+                        {new Date(policy.publishDate).toLocaleDateString('zh-CN')}
                       </span>
                     )}
                   </div>
@@ -130,7 +134,7 @@ export default function PolicyPage() {
             {totalPages > 1 && (
               <div className="flex justify-center gap-2 mt-8">
                 <button
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
                   className="px-4 py-2 bg-white rounded-lg disabled:opacity-50"
                 >
@@ -140,7 +144,7 @@ export default function PolicyPage() {
                   {page} / {totalPages}
                 </span>
                 <button
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
                   className="px-4 py-2 bg-white rounded-lg disabled:opacity-50"
                 >

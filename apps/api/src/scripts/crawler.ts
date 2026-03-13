@@ -14,6 +14,7 @@
 
 import crypto from 'node:crypto';
 import https from 'node:https';
+import '../config';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
