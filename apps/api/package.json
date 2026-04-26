@@ -11,6 +11,8 @@
     "prisma:studio": "prisma studio",
     "seed": "tsx src/database/seed.ts",
     "crawler": "tsx src/scripts/crawler.ts",
+    "crawler:36kr": "tsx src/scripts/crawler-36kr.ts",
+    "crawler:sz": "tsx src/scripts/crawler-sz-oneperson.ts",
     "test": "jest"
   },
   "dependencies": {
