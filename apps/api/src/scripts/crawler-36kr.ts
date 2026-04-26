@@ -50,25 +50,38 @@ function scoreRelevance(title: string, description: string): number {
   const text = `${title} ${description || ''}`;
   let score = 0;
 
+  // 基础分：只要是 36Kr 的科技/创业快讯就有价值
+  score += 10;
+
   // AI 相关 - 高权重
-  if (matchesKeywords(text, ['AI', '人工智能', '大模型', 'LLM', 'AIGC', 'ChatGPT', 'OpenAI', 'DeepSeek'])) {
+  if (matchesKeywords(text, ['AI', '人工智能', '大模型', 'LLM', 'AIGC', 'ChatGPT', 'OpenAI', 'DeepSeek', '大模型', '模型'])) {
     score += 30;
   }
   // 创业投资
-  if (matchesKeywords(text, ['融资', '投资', 'VC', '天使', '估值', '独角兽', '初创'])) {
+  if (matchesKeywords(text, ['融资', '投资', 'VC', '天使', '估值', '独角兽', '初创', '创业', 'IPO', '上市', '收购', '并购'])) {
     score += 20;
   }
   // 赛事活动
-  if (matchesKeywords(text, ['黑客松', 'hackathon', '大赛', '路演', '峰会'])) {
+  if (matchesKeywords(text, ['黑客松', 'hackathon', '大赛', '路演', '峰会', '沙龙', '创新', '挑战'])) {
     score += 20;
   }
   // 科技
-  if (matchesKeywords(text, ['开源', 'SaaS', '云服务', '数字化', '技术'])) {
+  if (matchesKeywords(text, ['开源', 'SaaS', '云服务', '数字化', '技术', '芯片', '软件', '互联网', '数字经济'])) {
+    score += 15;
+  }
+  // 政策
+  if (matchesKeywords(text, ['政策', '补贴', '扶持', '资金', '税收', '优惠', '支持', '试点'])) {
     score += 10;
   }
-  // 创业
-  if (matchesKeywords(text, ['创业'])) {
-    score += 10;
+
+  // 排除低质量
+  if (matchesKeywords(text, EXCLUDE_KEYWORDS)) {
+    score = 0;
+  }
+
+  // 标题太短不处理
+  if (title.length < 8) {
+    score = 0;
   }
 
   return score;
