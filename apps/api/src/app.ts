@@ -18,6 +18,7 @@ import recommendationRoutes from './modules/recommendations/routes';
 import informationRoutes from './modules/information/routes';
 import linkRoutes from './modules/links/routes';
 import skillRoutes from './modules/skills/routes';
+import searchRoutes from './modules/search/routes';
 
 const app: Express = express();
 
@@ -46,6 +47,7 @@ app.use('/api/v1/recommendations', recommendationRoutes);
 app.use('/api/v1/information', informationRoutes);
 app.use('/api/v1/links', linkRoutes);
 app.use('/api/v1/skills', skillRoutes);
+app.use('/api/v1/search', searchRoutes);
 
 // 404 handler
 app.use((_req, res) => {
