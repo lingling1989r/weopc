@@ -38,7 +38,7 @@ export function Header() {
             <Link href="/skills" className="text-gray-700 hover:text-blue-600 font-medium">
               Skill 市场
             </Link>
-            <Link href="/toolbox/links" className="text-gray-700 hover:text-blue-600 font-medium">
+            <Link href="/toolbox" className="text-gray-700 hover:text-blue-600 font-medium">
               工具箱
             </Link>
 

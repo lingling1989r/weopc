@@ -128,6 +128,13 @@ export const skillsApi = {
   getMyPurchased: () => authenticatedApiClient.get('/skills/my/purchased'),
 };
 
+// Overseas search engine analysis API
+export const searchApi = {
+  getPlatforms: () => publicApiClient.get('/search/platforms'),
+  query: (data: { query: string; platforms: string[]; limit?: number }) =>
+    authenticatedApiClient.post('/search/query', data),
+};
+
 // Admin Skills API
 export const adminSkillsApi = {
   getPending: () => authenticatedApiClient.get('/admin/skills/pending'),

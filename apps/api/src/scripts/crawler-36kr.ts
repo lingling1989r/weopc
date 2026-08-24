@@ -13,23 +13,6 @@ const prisma = new PrismaClient();
 
 // 36Kr 快讯 API
 const NEWSFLASH_API = 'https://www.36kr.com/api/newsflash';
-// 36Kr 文章 API
-const ARTICLE_API = 'https://www.36kr.com/api/article/listing';
-
-// 目标关键词（与你的目标相关）
-const TARGET_KEYWORDS = [
-  // AI 相关
-  'AI', '人工智能', '大模型', 'LLM', 'AIGC', 'ChatGPT', 'OpenAI', 'DeepSeek',
-  '机器学习', '深度学习', '算法', '智能', '自动化',
-  // 创业/投资
-  '创业', '融资', '投资', 'VC', '天使', '估值', 'IPO', '上市',
-  '赛道', '风口', '独角兽', '初创',
-  // 赛事/活动
-  '黑客松', 'hackathon', '大赛', '比赛', '路演', '峰会', '沙龙',
-  // 科技
-  '科技', '技术', '开源', 'SaaS', '云服务', '数字化',
-];
-
 // 需要排除的关键词（低质量/不相关内容）
 const EXCLUDE_KEYWORDS = [
   '反腐', '落马', '违纪', '双规', '调查', '受贿',
@@ -113,7 +96,7 @@ async function fetchJson<T>(url: string): Promise<T> {
   if (!res.ok) {
     throw new Error(`HTTP ${res.status}`);
   }
-  return res.json();
+  return (await res.json()) as T;
 }
 
 interface NewsflashItem {

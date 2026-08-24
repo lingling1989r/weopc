@@ -30,4 +30,14 @@ export const config = {
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'),
     maxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
   },
+
+  search: {
+    openSerpBaseUrl: process.env.OPENSERP_BASE_URL || '',
+    openSerpApiKey: process.env.OPENSERP_API_KEY || undefined,
+    timeoutMs: parseInt(process.env.SEARCH_TIMEOUT_MS || '8000'),
+    cacheTtlMs: parseInt(process.env.SEARCH_CACHE_TTL_MS || '300000'),
+    directFallback: process.env.SEARCH_DIRECT_FALLBACK !== 'false',
+    rateLimitWindowMs: parseInt(process.env.SEARCH_RATE_LIMIT_WINDOW_MS || '900000'),
+    rateLimitMaxRequests: parseInt(process.env.SEARCH_RATE_LIMIT_MAX_REQUESTS || '30'),
+  },
 };

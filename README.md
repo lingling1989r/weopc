@@ -108,6 +108,12 @@ weopc/
 - `GET /api/v1/projects/:projectId/leads` - Get project leads (PROVIDER)
 - `PATCH /api/v1/leads/:id` - Update lead status (PROVIDER)
 
+### Overseas search analysis
+- `GET /api/v1/search/platforms` - List configured search platforms
+- `POST /api/v1/search/query` - Search across selected platforms (authenticated)
+
+See [`docs/search-engine-analysis.md`](docs/search-engine-analysis.md) for OpenSERP deployment, fallback behavior, limits and compliance notes.
+
 ## User Roles
 
 - **USER**: Can browse projects and submit leads
